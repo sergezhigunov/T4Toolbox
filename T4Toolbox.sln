@@ -1,17 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35825.156 d17.13
+VisualStudioVersion = 17.13.35825.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{42F21B27-CBA5-4FB6-A855-8B74F05F56CD}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
-		CodeAnalysisDictionary.xml = CodeAnalysisDictionary.xml
 		CommonAssemblyInfo.cs = CommonAssemblyInfo.cs
 		LocalTestRun.testrunconfig = LocalTestRun.testrunconfig
 		README.md = README.md
 		T4Toolbox.Common.props = T4Toolbox.Common.props
-		T4Toolbox.Common.ruleset = T4Toolbox.Common.ruleset
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3594248C-C8A9-4EAB-8E63-0914300D4ECE}"
@@ -19,7 +17,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{994DFDA5-97F7-4688-A2FA-6D8E7AB2BC18}"
 	ProjectSection(SolutionItems) = preProject
 		test\T4Toolbox.Tests.props = test\T4Toolbox.Tests.props
-		test\T4Toolbox.Tests.ruleset = test\T4Toolbox.Tests.ruleset
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{0658B25D-9363-4E23-99F9-0A371A5AB636}"
@@ -126,5 +123,8 @@ Global
 		{7CBACA4C-728A-4818-839C-E22C24677AFA} = {994DFDA5-97F7-4688-A2FA-6D8E7AB2BC18}
 		{FDE953D3-AD27-4398-8EF4-293C0CEBDC3E} = {3594248C-C8A9-4EAB-8E63-0914300D4ECE}
 		{E8BB5F81-8B2B-4DD4-BAAF-A22C26183F41} = {994DFDA5-97F7-4688-A2FA-6D8E7AB2BC18}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {62E6B8E0-D0B6-4DE4-A49E-4CDFE58833BA}
 	EndGlobalSection
 EndGlobal
