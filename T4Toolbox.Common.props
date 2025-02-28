@@ -31,11 +31,10 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
 
-  <!-- Sign assemblies if the T4Toolbox.snk file is present -->
-  <PropertyGroup Condition="Exists('$(MSBuildThisFileDirectory)\T4Toolbox.snk')">
+  <!-- Sign assemblies -->
+  <PropertyGroup>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)\T4Toolbox.snk</AssemblyOriginatorKeyFile>
-    <DefineConstants>$(DefineConstants);SIGN_ASSEMBLY</DefineConstants>
   </PropertyGroup>
 
 
