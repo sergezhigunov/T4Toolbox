@@ -1,5 +1,5 @@
-﻿// <copyright file="TemplateParser.lex" company="Oleg Sych">
-//  Copyright © Oleg Sych. All Rights Reserved.
+// <copyright file="TemplateParser.lex" company="Oleg Sych">
+//  Copyright � Oleg Sych. All Rights Reserved.
 // </copyright>
 
 %namespace T4Toolbox.TemplateAnalysis
@@ -18,9 +18,9 @@ Name            [a-zA-Z_][a-zA-Z0-9_]*
 
 // States
 
-%x CodeBlock      // Scanner is inside of a Statement, Expression or Class Feature block 
+%x CodeBlock      // Scanner is inside of a Statement, Expression or Class Feature block
 %x Directive      // Scanner is inside of a Directive
-%x Attributes     // Scanner is inside of a Directive, after the name of the directive 
+%x Attributes     // Scanner is inside of a Directive, after the name of the directive
 %x AttributeValue // Scanner is inside of an attribute value
 
 %% // Rules (Scan/switch)
@@ -36,31 +36,31 @@ Name            [a-zA-Z_][a-zA-Z0-9_]*
     return (int)this.yylval.Kind;
 }
 
-{BlockStart} { 
+{BlockStart} {
     this.yylval = new StatementBlockStart(this.tokPos, this.CurrentPosition);
     this.BeginToken(CodeBlock);
     return (int)this.yylval.Kind;
 }
 
-{BlockStart}= { 
+{BlockStart}= {
     this.yylval = new ExpressionBlockStart(this.tokPos, this.CurrentPosition);
     this.BeginToken(CodeBlock);
     return (int)this.yylval.Kind;
 }
 
-{BlockStart}\+ { 
+{BlockStart}\+ {
     this.yylval = new ClassBlockStart(this.tokPos, this.CurrentPosition);
     this.BeginToken(CodeBlock);
     return (int)this.yylval.Kind;
 }
 
-{BlockStart}@ { 
+{BlockStart}@ {
     this.yylval = new DirectiveBlockStart(this.tokPos, this.CurrentPosition);
     this.BEGIN(Directive);
     return (int)this.yylval.Kind;
 }
 
-{BlockEnd} { 
+{BlockEnd} {
     this.yylval = new BlockEnd(this.tokPos, this.CurrentPosition);
     return (int)this.yylval.Kind;
 }
@@ -78,7 +78,7 @@ Name            [a-zA-Z_][a-zA-Z0-9_]*
     }
 
     ({BlockStart}|{BlockEnd}) {
-        this.BEGIN(INITIAL); 
+        this.BEGIN(INITIAL);
         this.DiscardToken();
     }
 
@@ -106,7 +106,7 @@ Name            [a-zA-Z_][a-zA-Z0-9_]*
     }
 
     ({BlockStart}|{BlockEnd}) {
-        this.BEGIN(INITIAL); 
+        this.BEGIN(INITIAL);
         this.DiscardToken();
     }
 
@@ -117,11 +117,11 @@ Name            [a-zA-Z_][a-zA-Z0-9_]*
 }
 
 <AttributeValue> {
-    \" {       
+    \" {
         if (this.tokPos > this.tokenStart)
         {
             this.yylval = new AttributeValue(this.tokenStart, this.buffer.GetString(this.tokenStart, this.tokPos), this.tokenPosition);
-            this.tokenStart = this.tokPos; // discard the attribute value token 
+            this.tokenStart = this.tokPos; // discard the attribute value token
             this.DiscardToken();
             return (int)this.yylval.Kind;
         }
@@ -160,7 +160,7 @@ Name            [a-zA-Z_][a-zA-Z0-9_]*
 
 <CodeBlock> {
     ({BlockStart}|{BlockEnd}) {
-        this.BEGIN(INITIAL); 
+        this.BEGIN(INITIAL);
         this.DiscardToken();
 
         if (this.tokPos > this.tokenStart)
@@ -176,7 +176,7 @@ Name            [a-zA-Z_][a-zA-Z0-9_]*
         if (eofPos > this.tokenStart)
         {
             this.yylval = new Code(Span.FromBounds(this.tokenStart, eofPos), this.tokenPosition);
-            this.tokenStart = this.tokPos; // discard the code token 
+            this.tokenStart = this.tokPos; // discard the code token
             this.yyless(0); // discard the end of file token
             return (int)this.yylval.Kind;
         }

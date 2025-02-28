@@ -1,5 +1,5 @@
-﻿// <copyright file="TemplateParser.y" company="Oleg Sych">
-//  Copyright © Oleg Sych. All Rights Reserved.
+// <copyright file="TemplateParser.y" company="Oleg Sych">
+//  Copyright � Oleg Sych. All Rights Reserved.
 // </copyright>
 
 %namespace T4Toolbox.TemplateAnalysis
