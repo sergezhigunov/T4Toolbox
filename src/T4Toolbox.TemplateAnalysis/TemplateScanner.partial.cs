@@ -2,6 +2,8 @@
 //  Copyright © Oleg Sych. All Rights Reserved.
 // </copyright>
 
+// Ignore Spelling: yyerror
+
 namespace T4Toolbox.TemplateAnalysis
 {
     using System;
@@ -35,7 +37,6 @@ namespace T4Toolbox.TemplateAnalysis
             get { return new Position(this.tokLin - 1, Math.Max(0, this.tokCol)); } 
         }
 
-        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "This method is defined by GPPG.")]
         public override void yyerror(string format, params object[] args)
         {
             Debug.Assert(this.Parser != null, "Parser is not initialized");

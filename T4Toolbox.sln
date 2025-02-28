@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35825.156 d17.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{42F21B27-CBA5-4FB6-A855-8B74F05F56CD}"
 	ProjectSection(SolutionItems) = preProject
@@ -10,7 +10,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		CommonAssemblyInfo.cs = CommonAssemblyInfo.cs
 		LocalTestRun.testrunconfig = LocalTestRun.testrunconfig
 		README.md = README.md
-		Settings.StyleCop = Settings.StyleCop
 		T4Toolbox.Common.props = T4Toolbox.Common.props
 		T4Toolbox.Common.ruleset = T4Toolbox.Common.ruleset
 	EndProjectSection
@@ -19,7 +18,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3594248C-C8A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{994DFDA5-97F7-4688-A2FA-6D8E7AB2BC18}"
 	ProjectSection(SolutionItems) = preProject
-		test\Settings.StyleCop = test\Settings.StyleCop
 		test\T4Toolbox.Tests.props = test\T4Toolbox.Tests.props
 		test\T4Toolbox.Tests.ruleset = test\T4Toolbox.Tests.ruleset
 	EndProjectSection
