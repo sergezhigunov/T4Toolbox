@@ -17,7 +17,7 @@ namespace T4Toolbox.VisualStudio
     /// Visual Studio Package of the T4 Toolbox extension.
     /// </summary>
     [PackageRegistration(UseManagedResourcesOnly = true)]
-    [InstalledProductRegistration(AssemblyInfo.Product, AssemblyInfo.Description, AssemblyInfo.Version)]
+    [InstalledProductRegistration("T4 Toolbox", "Extends code generation capabilities of Text Templates.", "15.0.0.0")]
     [Guid(T4ToolboxPackage.Id)]
 
     // Register the T4 Toolbox page in the Visual Studio Options dialog

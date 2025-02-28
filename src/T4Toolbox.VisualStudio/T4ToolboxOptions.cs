@@ -20,7 +20,7 @@ namespace T4Toolbox.VisualStudio
     /// </summary>
     internal class T4ToolboxOptions : IProfileManager, INotifyPropertyChanged, ITemplateEditorOptions
     {
-        internal const string Category = T4Toolbox.AssemblyInfo.Product;
+        internal const string Category = "T4 Toolbox";
         internal const string Page = "General";
 
         private static T4ToolboxOptions instance;
@@ -84,7 +84,7 @@ namespace T4Toolbox.VisualStudio
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether error underlining is enabled for text templates. 
+        /// Gets or sets a value indicating whether error underlining is enabled for text templates.
         /// </summary>
         /// <remarks>
         /// This property allows users to disable error underlining if it causes performance problems.
@@ -107,7 +107,7 @@ namespace T4Toolbox.VisualStudio
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether color syntax highlighting is enabled. 
+        /// Gets or sets a value indicating whether color syntax highlighting is enabled.
         /// </summary>
         /// <remarks>
         /// This property allows users to disable color syntax highlighting if it causes performance problems.
@@ -116,7 +116,7 @@ namespace T4Toolbox.VisualStudio
         public bool SyntaxColorizationEnabled
         {
             get { return this.syntaxColorizationEnabled; }
-            set { this.SetProperty(ref this.syntaxColorizationEnabled, value); } 
+            set { this.SetProperty(ref this.syntaxColorizationEnabled, value); }
         }
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace T4Toolbox.VisualStudio
                             {
                                 if (property.Converter.CanConvertFrom(value.GetType()))
                                 {
-                                    value = property.Converter.ConvertFrom(null, CultureInfo.InvariantCulture, value);                                
+                                    value = property.Converter.ConvertFrom(null, CultureInfo.InvariantCulture, value);
                                 }
                                 else
                                 {
@@ -168,7 +168,7 @@ namespace T4Toolbox.VisualStudio
                                     if (valueConverter.CanConvertTo(property.PropertyType))
                                     {
                                         value = valueConverter.ConvertTo(null, CultureInfo.InvariantCulture, value, property.PropertyType);
-                                    }                                    
+                                    }
                                 }
                             }
                             catch (FormatException)
@@ -178,7 +178,7 @@ namespace T4Toolbox.VisualStudio
 
                             if (property.PropertyType.IsInstanceOfType(value))
                             {
-                                property.SetValue(this, value);                                
+                                property.SetValue(this, value);
                             }
                         }
                     }
@@ -195,7 +195,7 @@ namespace T4Toolbox.VisualStudio
         {
             using (RegistryKey rootKey = this.GetSettingsRootKey())
             {
-                if (rootKey != null) 
+                if (rootKey != null)
                 {
                     using (RegistryKey settingsKey = rootKey.CreateSubKey(T4ToolboxOptions.Category))
                     {
@@ -239,10 +239,10 @@ namespace T4Toolbox.VisualStudio
         }
 
         protected virtual RegistryKey GetSettingsRootKey()
-        {            
+        {
             return VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_UserSettings, writable: true);
         }
-            
+
         private void InitializeProperties()
         {
             foreach (PropertyDescriptor property in this.GetProperties())
