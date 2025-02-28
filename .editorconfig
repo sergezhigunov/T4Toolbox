@@ -1,0 +1,22 @@
+root = true
+
+[*]
+indent_style = space
+insert_final_newline = false
+trim_trailing_whitespace = true
+guidelines = 140
+
+[*.{xml,config,*proj,props,resx,targets,ruleset,testrunconfig}]
+indent_size = 2
+charset = utf-8
+
+[*.json]
+indent_size = 2
+
+[*.{yml,yaml}]
+indent_size = 2
+
+[*.{cs,csx,vb,vbx}]
+indent_size = 4
+max_line_length = 140
+charset = utf-8-bom
