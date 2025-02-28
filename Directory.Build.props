@@ -1,0 +1,12 @@
+<Project>
+
+  <PropertyGroup>
+    <Product>T4 Toolbox</Product>
+    <Description>Extends code generation capabilities of Text Templates.</Description>
+    <Company>Oleg Sych</Company>
+    <Copyright>Copyright © Oleg Sych. All Rights Reserved.</Copyright>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <VersionPrefix>15.0.0</VersionPrefix>
+  </PropertyGroup>
+  
+</Project>

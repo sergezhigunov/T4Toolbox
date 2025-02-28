@@ -8,15 +8,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		CommonAssemblyInfo.cs = CommonAssemblyInfo.cs
+		Directory.Build.props = Directory.Build.props
 		LocalTestRun.testrunconfig = LocalTestRun.testrunconfig
 		README.md = README.md
 		T4Toolbox.Common.props = T4Toolbox.Common.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3594248C-C8A9-4EAB-8E63-0914300D4ECE}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{994DFDA5-97F7-4688-A2FA-6D8E7AB2BC18}"
 	ProjectSection(SolutionItems) = preProject
+		test\Directory.Build.props = test\Directory.Build.props
 		test\T4Toolbox.Tests.props = test\T4Toolbox.Tests.props
 	EndProjectSection
 EndProject
