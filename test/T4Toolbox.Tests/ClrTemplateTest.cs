@@ -6,18 +6,15 @@ namespace T4Toolbox.Tests
 {
     using System;
     using System.IO;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.VisualStudio.TextTemplating;
 
     /// <summary>
     /// A test class for <see cref="ClrTemplate" />.
     /// </summary>
-    [TestClass]
     public class ClrTemplateTest 
     {
         #region DefaultNamespace
 
-        [TestMethod]
+        [Fact]
         public void DefaultNamespaceReturnsRootNamespaceForInputFileInRootOfProject()
         {
             using (var transformation = new FakeTransformation())
@@ -40,11 +37,11 @@ namespace T4Toolbox.Tests
                     }
                 };
 
-                Assert.AreEqual("TestNamespace", template.DefaultNamespace);
+                Assert.Equal("TestNamespace", template.DefaultNamespace);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void DefaultNamespaceCombinesRelativeInputFilePathWithRootNamespace()
         {
             using (var transformation = new FakeTransformation())
@@ -67,11 +64,11 @@ namespace T4Toolbox.Tests
                     }
                 };
 
-                Assert.AreEqual("TestNamespace.SubFolder", template.DefaultNamespace);
+                Assert.Equal("TestNamespace.SubFolder", template.DefaultNamespace);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void DefaultNamespaceUsesProjectItemLinkPathInsteadOfPhysicalFilePath()
         {
             using (var transformation = new FakeTransformation())
@@ -106,13 +103,13 @@ namespace T4Toolbox.Tests
                     }
                 };
 
-                Assert.AreEqual("TestNamespace.SubFolder", template.DefaultNamespace);
+                Assert.Equal("TestNamespace.SubFolder", template.DefaultNamespace);
             }
         }
 
         #endregion
 
-        [TestMethod]
+        [Fact]
         public void RootNamespaceReturnsPropertyValueSuppliedByProvider()
         {
             using (var transformation = new FakeTransformation())
@@ -129,8 +126,8 @@ namespace T4Toolbox.Tests
                     return ExpectedValue;
                 };
 
-                Assert.AreEqual(ExpectedValue, template.RootNamespace);
-                Assert.AreEqual("RootNamespace", actualPropertyName);
+                Assert.Equal(ExpectedValue, template.RootNamespace);
+                Assert.Equal("RootNamespace", actualPropertyName);
             }
         }
 

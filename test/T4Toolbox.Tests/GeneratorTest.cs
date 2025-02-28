@@ -7,12 +7,10 @@ namespace T4Toolbox.Tests
     using System;
     using System.CodeDom.Compiler;
     using System.Linq;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
     /// This is a test class for <see cref="Generator"/> and is intended to contain all of its unit tests.
     /// </summary>
-    [TestClass]
     public class GeneratorTest : IDisposable
     {
         private const string TestMessage = "Test Message";
@@ -35,91 +33,91 @@ namespace T4Toolbox.Tests
 
         #region Context
 
-        [TestMethod]
+        [Fact]
         public void ContextReturnsTransformationContextByDefault()
         {
-            Assert.AreSame(TransformationContext.Current, this.generator.Context);
+            Assert.Same(TransformationContext.Current, this.generator.Context);
         }
 
-        [TestMethod]
+        [Fact]
         public void ContextCanBeSet()
         {
             using (var transformation = new FakeTransformation())
             using (var context = new TransformationContext(transformation, transformation.GenerationEnvironment))
             {
                 this.generator.Context = context;
-                Assert.AreSame(context, this.generator.Context);
+                Assert.Same(context, this.generator.Context);
             }
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void ContextThrowsArgumentNullExceptionWhenNewValueIsNull() // Because allowing it would magically change property value to TransformationContext.Current.
         {
-            this.generator.Context = null;
+            Assert.Throws<ArgumentNullException>(() => this.generator.Context = null);
         }
 
         #endregion
 
         #region Error(string)
 
-        [TestMethod]
+        [Fact]
         public void ErrorAddsNewErrorToErrorsCollection()
         {
             this.generator.Error(TestMessage);
-            Assert.AreEqual(1, this.generator.Errors.Count);
-            Assert.AreEqual(TestMessage, this.generator.Errors[0].ErrorText);
-            Assert.AreEqual(false, this.generator.Errors[0].IsWarning);
+            Assert.Equal(1, this.generator.Errors.Count);
+            Assert.Equal(TestMessage, this.generator.Errors[0].ErrorText);
+            Assert.Equal(false, this.generator.Errors[0].IsWarning);
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void ErrorThrowsArgumentNullExceptionWhenMessageIsNull()
         {
-            this.generator.Error(null);
+            Assert.Throws<ArgumentNullException>(() => this.generator.Error(null));
         }
 
         #endregion
 
         #region Error(string, params object[])
 
-        [TestMethod]
+        [Fact]
         public void ErrorFormatAddsNewErrorToErrorsCollection()
         {
             this.generator.Error("{0}", TestMessage);
-            Assert.AreEqual(1, this.generator.Errors.Count);
-            Assert.AreEqual(TestMessage, this.generator.Errors[0].ErrorText);
-            Assert.AreEqual(false, this.generator.Errors[0].IsWarning);
+            Assert.Equal(1, this.generator.Errors.Count);
+            Assert.Equal(TestMessage, this.generator.Errors[0].ErrorText);
+            Assert.Equal(false, this.generator.Errors[0].IsWarning);
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void ErrorFormatThrowsArgumentNullExceptionWhenFormatIsNull()
         {
-            this.generator.Error(null, null);
+            Assert.Throws<ArgumentNullException>(() => this.generator.Error(null, null));
         }
 
         #endregion
 
         #region Errors
 
-        [TestMethod]
+        [Fact]
         public void ErrorsIsNotNull()
         {
-            Assert.IsNotNull(this.generator.Errors);
+            Assert.NotNull(this.generator.Errors);
         }
 
         #endregion
 
         #region Run
 
-        [TestMethod]
+        [Fact]
         public void RunValidatesGenerator()
         {
             bool validated = false;
             this.generator.Validated = () => validated = true;
             this.generator.Run();
-            Assert.IsTrue(validated);
+            Assert.True(validated);
         }
 
-        [TestMethod]
+        [Fact]
         public void RunSkipsRunCoreIfValidateGeneratesErrors()
         {
             this.generator.Validated = () => this.generator.Error("Test Error");
@@ -128,10 +126,10 @@ namespace T4Toolbox.Tests
             this.generator.RanCore = () => runCoreExecuted = true;
 
             this.generator.Run();
-            Assert.IsFalse(runCoreExecuted);
+            Assert.False(runCoreExecuted);
         }
 
-        [TestMethod]
+        [Fact]
         public void RunExecutesRunCoreIfValidateGeneratesWarnings()
         {
             this.generator.Validated = () => this.generator.Warning(TestMessage);
@@ -140,38 +138,38 @@ namespace T4Toolbox.Tests
             this.generator.RanCore = () => runCoreExecuted = true;
 
             this.generator.Run();
-            Assert.IsTrue(runCoreExecuted);
+            Assert.True(runCoreExecuted);
         }
 
-        [TestMethod]
+        [Fact]
         public void RunReportsTransformationExceptionsAsError()
         {
             const string ErrorMessage = "Test Error";
             this.generator.Validated = () => { throw new TransformationException(ErrorMessage); };
 
             this.generator.Run();
-            Assert.AreEqual(1, this.generator.Errors.Count);
-            Assert.AreEqual(ErrorMessage, this.generator.Errors[0].ErrorText);
+            Assert.Equal(1, this.generator.Errors.Count);
+            Assert.Equal(ErrorMessage, this.generator.Errors[0].ErrorText);
         }
 
-        [TestMethod]
+        [Fact]
         public void RunReportsErrorsToTransformation()
         {
             this.generator.Validated = () => this.generator.Warning(TestMessage);
             this.generator.Run();
-            Assert.AreEqual(1, this.transformation.Errors.Count);
-            Assert.AreEqual(TestMessage, this.transformation.Errors[0].ErrorText);
+            Assert.Equal(1, this.transformation.Errors.Count);
+            Assert.Equal(TestMessage, this.transformation.Errors[0].ErrorText);
         }
 
-        [TestMethod]
+        [Fact]
         public void RunClearsPreviousErrorsToAvoidReportingThemToTransformationMoreThanOnce()
         {
             this.generator.Error(TestMessage);
             this.generator.Run();
-            Assert.AreEqual(0, this.generator.Errors.Count);
+            Assert.Equal(0, this.generator.Errors.Count);
         }
 
-        [TestMethod]
+        [Fact]
         public void RunReportsInputFileInErrorsOfInputFileBasedTransformation()
         {
             this.transformation.Session[TransformationContext.InputFileNameKey] = "Input.cs";
@@ -179,10 +177,10 @@ namespace T4Toolbox.Tests
             this.generator.Run();
 
             var error = this.transformation.Errors.Cast<CompilerError>().Single();
-            Assert.AreEqual("Input.cs", error.FileName);
+            Assert.Equal("Input.cs", error.FileName);
         }
 
-        [TestMethod]
+        [Fact]
         public void RunReportsTemplateFileInErrorsOfTemplateFileBasedTransformation()
         {
             this.transformation.Host.TemplateFile = "Template.tt";
@@ -190,46 +188,45 @@ namespace T4Toolbox.Tests
             this.generator.Run();
 
             var error = this.transformation.Errors.Cast<CompilerError>().Single();
-            Assert.AreEqual("Template.tt", error.FileName);
+            Assert.Equal("Template.tt", error.FileName);
         }
 
         #endregion
 
         #region Warning(string)
 
-        [TestMethod]
+        [Fact]
         public void WarningAddsWarningToErrorsCollection()
         {
             const string WarningMessage = TestMessage;
             this.generator.Warning(WarningMessage);
-            Assert.AreEqual(1, this.generator.Errors.Count);
-            Assert.AreEqual(WarningMessage, this.generator.Errors[0].ErrorText);
-            Assert.AreEqual(true, this.generator.Errors[0].IsWarning);
+            Assert.Equal(1, this.generator.Errors.Count);
+            Assert.Equal(WarningMessage, this.generator.Errors[0].ErrorText);
+            Assert.Equal(true, this.generator.Errors[0].IsWarning);
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
         public void WarningThrowsArgumentNullExceptionWhenMessageIsNull()
         {
-            this.generator.Warning(null);
+            Assert.Throws<ArgumentNullException>(() => this.generator.Warning(null));
         }
 
         #endregion
 
         #region Warning(string, params object[])
 
-        [TestMethod]
+        [Fact]
         public void WarningFormatAddsWarningToErrorsCollection()
         {
             this.generator.Warning("{0}", TestMessage);
-            Assert.AreEqual(1, this.generator.Errors.Count);
-            Assert.AreEqual(TestMessage, this.generator.Errors[0].ErrorText);
-            Assert.AreEqual(true, this.generator.Errors[0].IsWarning);
+            Assert.Equal(1, this.generator.Errors.Count);
+            Assert.Equal(TestMessage, this.generator.Errors[0].ErrorText);
+            Assert.Equal(true, this.generator.Errors[0].IsWarning);
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void WarningFormatThrowsArgumentNullExceptionWhenFormatIsNull()
         {
-            this.generator.Warning(null, null);
+            Assert.Throws<ArgumentNullException>(() => this.generator.Warning(null, null));
         }
 
         #endregion

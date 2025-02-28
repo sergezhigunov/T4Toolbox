@@ -7,10 +7,7 @@ namespace T4Toolbox.Tests
     using System;
     using System.CodeDom.Compiler;
     using System.Linq;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.VisualStudio.TextTemplating;
 
-    [TestClass]
     public class TemplateTest : IDisposable
     {
         private const string TestFile = "Test.txt";
@@ -39,16 +36,16 @@ namespace T4Toolbox.Tests
 
         #region Context
 
-        [TestMethod]
+        [Fact]
         public void ContextReturnsTransformationContextByDefault()
         {
             using (var template = new FakeTemplate())
             {
-                Assert.AreSame(TransformationContext.Current, template.Context);
+                Assert.Same(TransformationContext.Current, template.Context);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void ContextCanBeSet()
         {
             using (var transformation = new FakeTransformation())
@@ -56,39 +53,37 @@ namespace T4Toolbox.Tests
             using (var template = new FakeTemplate())
             {
                 template.Context = context;
-                Assert.AreSame(context, template.Context);
+                Assert.Same(context, template.Context);
             }
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void ContextThrowsArgumentNullExceptionWhenNewValueIsNull() // Because allowing it would magically change property value to TransformationContext.Current.
         {
-            using (var template = new FakeTemplate())
-            {
-                template.Context = null;
-            }
+            using var template = new FakeTemplate();
+            Assert.Throws<ArgumentNullException>(() => template.Context = null);
         }
 
         #endregion
 
         #region Enabled
 
-        [TestMethod]
+        [Fact]
         public void EnabledIsTrueByDefault()
         {
             using (var template = new FakeTemplate())
             {
-                Assert.IsTrue(template.Enabled);
+                Assert.True(template.Enabled);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void EnabledCanBeSet()
         {
             using (var template = new FakeTemplate())
             {
                 template.Enabled = false;
-                Assert.AreEqual(false, template.Enabled);
+                Assert.Equal(false, template.Enabled);
             }
         }
 
@@ -96,25 +91,24 @@ namespace T4Toolbox.Tests
 
         #region Error(string)
 
-        [TestMethod]
+        [Fact]
         public void ErrorAddsNewErrorToErrorsCollection()
         {
             using (var template = new FakeTemplate())
             {
                 template.Error(TestMessage);
-                Assert.AreEqual(1, template.Errors.Count);
-                Assert.AreEqual(TestMessage, template.Errors[0].ErrorText);
-                Assert.AreEqual(false, template.Errors[0].IsWarning);                
+                Assert.Equal(1, template.Errors.Count);
+                Assert.Equal(TestMessage, template.Errors[0].ErrorText);
+                Assert.Equal(false, template.Errors[0].IsWarning);
             }
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void ErrorThrowsArgumentNullExceptionWhenMessageIsNull()
         {
             using (var template = new FakeTemplate())
             {
-                template.Error(null);
+                Assert.Throws<ArgumentNullException>(() => template.Error(null));
             }
         }
 
@@ -122,25 +116,24 @@ namespace T4Toolbox.Tests
 
         #region Error(string, params object[])
 
-        [TestMethod]
+        [Fact]
         public void ErrorFormatAddsNewErrorToErrorsCollection()
         {
             using (var template = new FakeTemplate())
             {
                 template.Error("{0}", TestMessage);
-                Assert.AreEqual(1, template.Errors.Count);
-                Assert.AreEqual(TestMessage, template.Errors[0].ErrorText);
-                Assert.AreEqual(false, template.Errors[0].IsWarning);                
+                Assert.Equal(1, template.Errors.Count);
+                Assert.Equal(TestMessage, template.Errors[0].ErrorText);
+                Assert.Equal(false, template.Errors[0].IsWarning);
             }
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void ErrorFormatThrowsNullArgumentExceptionWhenFormatIsNull()
         {
             using (var template = new FakeTemplate())
             {
-                template.Error(null, null);                
+                Assert.Throws<ArgumentNullException>(() => template.Error(null, null));
             }
         }
 
@@ -148,12 +141,12 @@ namespace T4Toolbox.Tests
 
         #region Errors
 
-        [TestMethod]
+        [Fact]
         public void ErrorsIsNotNull()
         {
             using (var template = new FakeTemplate())
             {
-                Assert.IsNotNull(template.Errors);                
+                Assert.NotNull(template.Errors);
             }
         }
 
@@ -161,7 +154,7 @@ namespace T4Toolbox.Tests
 
         #region Render
 
-        [TestMethod]
+        [Fact]
         public void RenderDoesNotTransformTemplateWhenEnabledIsFalse()
         {
             using (var template = new FakeTemplate())
@@ -170,11 +163,11 @@ namespace T4Toolbox.Tests
                 bool transformed = false;
                 template.TransformedText = () => transformed = true;
                 template.Render();
-                Assert.IsFalse(transformed);
+                Assert.False(transformed);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void RenderRaisesRenderingEvent()
         {
             using (var template = new FakeTemplate())
@@ -182,11 +175,11 @@ namespace T4Toolbox.Tests
                 bool eventRaised = false;
                 template.Rendering += delegate { eventRaised = true; };
                 template.Render();
-                Assert.AreEqual(true, eventRaised);                
+                Assert.Equal(true, eventRaised);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void RenderTransformsTemplateWhenEnabledIsSetByRenderingEventHandler()
         {
             using (var template = new FakeTemplate())
@@ -196,11 +189,11 @@ namespace T4Toolbox.Tests
                 template.Rendering += delegate { template.Enabled = true; };
                 template.TransformedText = () => transformed = true;
                 template.Render();
-                Assert.IsTrue(transformed);
-            }            
+                Assert.True(transformed);
+            }
         }
 
-        [TestMethod]
+        [Fact]
         public void RenderReportsTransformationExceptionsAsErrors()
         {
             using (var template = new FakeTemplate())
@@ -211,7 +204,7 @@ namespace T4Toolbox.Tests
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void RenderReportsTemplateValidationErrorsToTransformation()
         {
             using (var template = new FakeTemplate())
@@ -222,7 +215,7 @@ namespace T4Toolbox.Tests
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void RenderReportsInputFileInErrorsOfInputFileBasedTransformation()
         {
             this.transformation.Session[TransformationContext.InputFileNameKey] = "Input.cs";
@@ -234,10 +227,10 @@ namespace T4Toolbox.Tests
             }
 
             var error = this.transformation.Errors.Cast<CompilerError>().Single();
-            Assert.AreEqual("Input.cs", error.FileName);
+            Assert.Equal("Input.cs", error.FileName);
         }
 
-        [TestMethod]
+        [Fact]
         public void RenderReportsTemplateFileInErrorsOfTemplateFileBasedTransformation()
         {
             this.transformation.Host.TemplateFile = "Template.tt";
@@ -249,24 +242,24 @@ namespace T4Toolbox.Tests
             }
 
             var error = this.transformation.Errors.Cast<CompilerError>().Single();
-            Assert.AreEqual("Template.tt", error.FileName);            
+            Assert.Equal("Template.tt", error.FileName);
         }
 
-        #endregion 
+        #endregion
 
         #region RenderToFile
 
-        [TestMethod]
+        [Fact]
         public void RenderToFileSetsOutputFile()
         {
             using (var template = new FakeTemplate())
             {
                 template.RenderToFile(TestFile);
-                Assert.AreEqual(TestFile, template.Output.File);
+                Assert.Equal(TestFile, template.Output.File);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void RenderToFileRendersTheTemplate()
         {
             OutputFile[] outputFiles = null;
@@ -281,19 +274,19 @@ namespace T4Toolbox.Tests
             this.Dispose(); // Force the end of transformation
 
             OutputFile outputFile = outputFiles.Single(output => output.File == TestFile);
-            Assert.AreEqual(TestOutput, outputFile.Content.ToString());
+            Assert.Equal(TestOutput, outputFile.Content.ToString());
         }
 
         #endregion
 
         #region Session
 
-        [TestMethod]
+        [Fact]
         public void SessionReturnsTransformationSession()
         {
             using (var template = new FakeTemplate())
             {
-                Assert.AreSame(this.transformation.Session, template.Session);
+                Assert.Same(this.transformation.Session, template.Session);
             }
         }
 
@@ -301,7 +294,7 @@ namespace T4Toolbox.Tests
 
         #region Transform
 
-        [TestMethod]
+        [Fact]
         public void TransformRunsCodeGeneratedByDirectiveProcessors()
         {
             using (var template = new FakeTemplate())
@@ -309,65 +302,65 @@ namespace T4Toolbox.Tests
                 bool initialized = false;
                 template.Initialized = () => initialized = true;
                 template.Transform();
-                Assert.IsTrue(initialized);
-            }                        
+                Assert.True(initialized);
+            }
         }
 
-        [TestMethod]
+        [Fact]
         public void TransformValidatesTemplate()
         {
             using (var template = new FakeTemplate())
             {
                 template.Validated = () => template.Error(TestMessage);
                 template.Transform();
-                Assert.AreEqual(1, template.Errors.Count);
-            }            
+                Assert.Equal(1, template.Errors.Count);
+            }
         }
 
-        [TestMethod, ExpectedException(typeof(TransformationException))]
+        [Fact]
         public void TransformDoesNotCatchTransformationException()
         {
             using (var template = new FakeTemplate())
             {
                 template.Validated = () => { throw new TransformationException(); };
-                template.Transform();
+                Assert.Throws<TransformationException>(() => template.Transform());
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void TransformDoesNotGenerateOutputWhenValidateReportsErrors()
         {
             using (var template = new FakeTemplate())
             {
                 template.TransformedText = () => template.WriteLine(TestOutput);
                 template.Validated = () => template.Error(TestMessage);
-                Assert.AreEqual(string.Empty, template.Transform());
+                Assert.Equal(string.Empty, template.Transform());
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void TransformGeneratesOutputWhenValidateReportsWarnings()
         {
             using (var template = new FakeTemplate())
             {
                 template.TransformedText = () => template.Write(TestOutput);
                 template.Validated = () => template.Warning(TestMessage);
-                Assert.AreEqual(TestOutput, template.Transform());
+                Assert.Equal(TestOutput, template.Transform());
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void TransformDoesNotValidateOutputProperties()
         {
             using (var template = new FakeTemplate())
             {
                 template.Output.Project = "Test.proj";
                 template.Transform();
-                Assert.AreEqual(0, template.Errors.Count);
+                Assert.Equal(0, template.Errors.Count);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void TransformClearsPreviousOutputToAllowGeneratingMultipleOutputsFromSingleTemplate()
         {
             using (var template = new FakeTemplate())
@@ -376,11 +369,11 @@ namespace T4Toolbox.Tests
                 template.Transform();
 
                 template.TransformedText = () => template.Write(TestOutput);
-                Assert.AreEqual(TestOutput, template.Transform());
+                Assert.Equal(TestOutput, template.Transform());
             }
         }
-        
-        [TestMethod]
+
+        [Fact]
         public void TransformClearsPreviousErrorsToAllowTransformingSameTemplateMultipleTimes()
         {
             using (var template = new FakeTemplate())
@@ -390,33 +383,32 @@ namespace T4Toolbox.Tests
 
                 template.Validated = null;
                 template.TransformedText = () => template.Write(TestOutput);
-                Assert.AreEqual(TestOutput, template.Transform());
-            }            
+                Assert.Equal(TestOutput, template.Transform());
+            }
         }
 
         #endregion
 
         #region Warning(string)
 
-        [TestMethod]
+        [Fact]
         public void WarningAddsNewWarningToErrorsCollection()
         {
             using (var template = new FakeTemplate())
             {
                 template.Warning(TestMessage);
-                Assert.AreEqual(1, template.Errors.Count);
-                Assert.AreEqual(TestMessage, template.Errors[0].ErrorText);
-                Assert.AreEqual(true, template.Errors[0].IsWarning);                
+                Assert.Equal(1, template.Errors.Count);
+                Assert.Equal(TestMessage, template.Errors[0].ErrorText);
+                Assert.Equal(true, template.Errors[0].IsWarning);
             }
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void WarningThrowsArgumentNullExceptionWhenMessageIsNull()
         {
             using (var template = new FakeTemplate())
             {
-                template.Warning(null);                
+                Assert.Throws<ArgumentNullException>(() => template.Warning(null));
             }
         }
 
@@ -424,25 +416,24 @@ namespace T4Toolbox.Tests
 
         #region Warning(string, params object[])
 
-        [TestMethod]
+        [Fact]
         public void WarningFormatAddsNewWarningToErrorsCollection()
         {
             using (var template = new FakeTemplate())
             {
                 template.Warning("{0}", TestMessage);
-                Assert.AreEqual(1, template.Errors.Count);
-                Assert.AreEqual(TestMessage, template.Errors[0].ErrorText);
-                Assert.AreEqual(true, template.Errors[0].IsWarning);                
+                Assert.Equal(1, template.Errors.Count);
+                Assert.Equal(TestMessage, template.Errors[0].ErrorText);
+                Assert.Equal(true, template.Errors[0].IsWarning);
             }
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void WarningFormatThrowsArgumentNullExceptionWhenFormatIsNull()
         {
             using (var template = new FakeTemplate())
             {
-                template.Warning(null, null);                
+                Assert.Throws<ArgumentNullException>(() => template.Warning(null, null));
             }
         }
 
@@ -453,7 +444,7 @@ namespace T4Toolbox.Tests
             var error = errors.Cast<CompilerError>().Single();
             foreach (string keyword in keywords)
             {
-                StringAssert.Contains(error.ErrorText, keyword);
+                Assert.Contains(keyword, error.ErrorText);
             }
         }
     }

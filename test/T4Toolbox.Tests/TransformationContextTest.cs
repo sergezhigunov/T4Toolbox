@@ -12,14 +12,12 @@ namespace T4Toolbox.Tests
     using System.Linq;
     using System.Runtime.Remoting.Messaging;
     using System.Text;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.VisualStudio.TextTemplating;
 
     /// <summary>
     /// This is a test class for <see cref="TransformationContext"/> and is intended
     /// to contain all of its unit tests.
     /// </summary>
-    [TestClass]
     public class TransformationContextTest
     {
         private const string TestText = "Test Text";
@@ -29,18 +27,18 @@ namespace T4Toolbox.Tests
         #region Cleanup
 
         [SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "value", Justification = "C# can't invoke property getter without a variable.")]
-        [TestMethod, ExpectedException(typeof(TransformationException))]
+        [Fact]
         public void CleanupRemovesCurrent()
         {
             using (var transformation = new FakeTransformation())
             {
                 TransformationContext.Initialize(transformation, transformation.GenerationEnvironment);
                 TransformationContext.Cleanup();
-                var value = TransformationContext.Current;
+                Assert.Throws<TransformationException>(() => _ = TransformationContext.Current);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void CleanupDisposesCurrent()
         {
             using (var transformation = new FakeTransformation())
@@ -56,11 +54,11 @@ namespace T4Toolbox.Tests
                     TransformationContext.Cleanup();
                 }
 
-                Assert.IsTrue(disposed);
+                Assert.True(disposed);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void CleanupDoesNotThrowExceptionsWhenContextIsNullBecauseTheyWouldObscureInitializationExceptions()
         {
             TransformationContext.Cleanup();
@@ -83,38 +81,38 @@ namespace T4Toolbox.Tests
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void ConstructorAddsMetadataValuesForMatchingParametersToTransformationSession()
         {
             using (var transformation = new FakeTransformationWithStringParameter())
             {
                 const string ExpectedValue = "TestValue";
                 const string ParameterName = "StringParameter";
-                transformation.Host.GetMetadataValue = (hierarchy, fileName, metadataName) => metadataName == ParameterName ? ExpectedValue : null;                
+                transformation.Host.GetMetadataValue = (hierarchy, fileName, metadataName) => metadataName == ParameterName ? ExpectedValue : null;
                 using (new TransformationContext(transformation, transformation.GenerationEnvironment))
                 {
-                    Assert.AreEqual(ExpectedValue, transformation.Session[ParameterName]);
+                    Assert.Equal(ExpectedValue, transformation.Session[ParameterName]);
                 }
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void ConstructorDoesNotOverrideParameterValuesSuppliedViaTransformationSession()
         {
             using (var transformation = new FakeTransformationWithStringParameter())
             {
                 const string ExpectedValue = "SessionValue";
-                const string ParameterName = "StringParameter";                
+                const string ParameterName = "StringParameter";
                 transformation.Host.GetMetadataValue = (hierarchy, fileName, metadataName) => metadataName == ParameterName ? "MetadataValue" : null;
                 transformation.Session[ParameterName] = ExpectedValue;
                 using (new TransformationContext(transformation, transformation.GenerationEnvironment))
                 {
-                    Assert.AreEqual(ExpectedValue, transformation.Session[ParameterName]);
+                    Assert.Equal(ExpectedValue, transformation.Session[ParameterName]);
                 }
-            }            
+            }
         }
 
-        [TestMethod]
+        [Fact]
         public void ConstructorDoesNotOverrideParameterValuesSuppliedViaCallContext()
         {
             using (var transformation = new FakeTransformationWithStringParameter())
@@ -126,7 +124,7 @@ namespace T4Toolbox.Tests
                 {
                     using (new TransformationContext(transformation, transformation.GenerationEnvironment))
                     {
-                        Assert.IsFalse(transformation.Session.ContainsKey(ParameterName));
+                        Assert.False(transformation.Session.ContainsKey(ParameterName));
                     }
                 }
                 finally
@@ -136,7 +134,7 @@ namespace T4Toolbox.Tests
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void ConstructorDoesNotModifyTransformationSessionWhenMetadataValueIsNotSpecified()
         {
             using (var transformation = new FakeTransformationWithStringParameter())
@@ -145,12 +143,12 @@ namespace T4Toolbox.Tests
                 transformation.Host.GetMetadataValue = (hierarchy, fileName, metadataName) => string.Empty;
                 using (new TransformationContext(transformation, transformation.GenerationEnvironment))
                 {
-                    Assert.IsFalse(transformation.Session.ContainsKey(ParameterName));
+                    Assert.False(transformation.Session.ContainsKey(ParameterName));
                 }
-            }            
+            }
         }
 
-        [TestMethod]
+        [Fact]
         public void ConstructorReportsErrorWhenParameterCannotBeInitializedBecauseSessionIsNull()
         {
             using (var transformation = new FakeTransformationWithStringParameter())
@@ -165,10 +163,10 @@ namespace T4Toolbox.Tests
                 transformation.Session = null;
                 using (new TransformationContext(transformation, transformation.GenerationEnvironment))
                 {
-                    Assert.IsNotNull(loggedErrors);
-                    StringAssert.Contains(loggedErrors.Cast<CompilerError>().Single().ErrorText, ParameterName);
+                    Assert.NotNull(loggedErrors);
+                    Assert.Contains(ParameterName, loggedErrors.Cast<CompilerError>().Single().ErrorText);
                 }
-            }                        
+            }
         }
 
         /// <summary>
@@ -184,7 +182,7 @@ namespace T4Toolbox.Tests
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void ConstructorConvertsMetadataValuesToParameterTypes()
         {
             using (var transformation = new FakeTransformationWithIntParameter())
@@ -194,12 +192,12 @@ namespace T4Toolbox.Tests
                 transformation.Host.GetMetadataValue = (hierarchy, fileName, metadataName) => metadataName == ParameterName ? ExpectedValue.ToString(CultureInfo.InvariantCulture) : null;
                 using (new TransformationContext(transformation, transformation.GenerationEnvironment))
                 {
-                    Assert.AreEqual(ExpectedValue, transformation.Session[ParameterName]);
+                    Assert.Equal(ExpectedValue, transformation.Session[ParameterName]);
                 }
-            }            
+            }
         }
 
-        [TestMethod]
+        [Fact]
         public void ConstructorReportsErrorWhenMetadataValueCannotBeConvertedToParameterType()
         {
             using (var transformation = new FakeTransformation())
@@ -208,16 +206,16 @@ namespace T4Toolbox.Tests
                 const string ParameterName = "Host";
                 const string MetadataValue = "InvalidValue";
                 transformation.Host.GetMetadataValue = (hierarchy, fileName, metadataName) => metadataName == ParameterName ? MetadataValue : null;
-                transformation.Host.LoggedErrors = errors => actualErrors = errors; 
+                transformation.Host.LoggedErrors = errors => actualErrors = errors;
                 using (new TransformationContext(transformation, transformation.GenerationEnvironment))
                 {
-                    Assert.IsNotNull(actualErrors);
-                    Assert.AreEqual(1, actualErrors.Count);
+                    Assert.NotNull(actualErrors);
+                    Assert.Equal(1, actualErrors.Count);
                     CompilerError error = actualErrors[0];
-                    Assert.IsFalse(error.IsWarning);
-                    StringAssert.Contains(error.ErrorText, ParameterName);
-                    StringAssert.Contains(error.ErrorText, MetadataValue);
-                    StringAssert.Contains(error.ErrorText, transformation.Host.GetType().Name);
+                    Assert.False(error.IsWarning);
+                    Assert.Contains(ParameterName, error.ErrorText);
+                    Assert.Contains(MetadataValue, error.ErrorText);
+                    Assert.Contains(transformation.Host.GetType().Name, error.ErrorText);
                 }
             }
         }
@@ -227,17 +225,17 @@ namespace T4Toolbox.Tests
         #region Current
 
         [SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "value", Justification = "C# can't invoke property getter without a variable.")]
-        [TestMethod, ExpectedException(typeof(TransformationException))]
+        [Fact]
         public void CurrentThrowsTransformationExceptionWhenContextWasNotInitialized()
         {
-            var value = TransformationContext.Current;
+            Assert.Throws<TransformationException>(() => _ = TransformationContext.Current);
         }
 
         #endregion
 
         #region Dispose
 
-        [TestMethod]
+        [Fact]
         public void DisposeRaisesDisposedEvent()
         {
             bool disposed = false;
@@ -247,10 +245,10 @@ namespace T4Toolbox.Tests
                 context.Disposed += delegate { disposed = true; };
             }
 
-            Assert.IsTrue(disposed);
+            Assert.True(disposed);
         }
 
-        [TestMethod]
+        [Fact]
         public void DisposeInvokesOutputFileManagerWhenThereAreAdditionalOutputs()
         {
             OutputFile[] outputFiles = null;
@@ -261,10 +259,10 @@ namespace T4Toolbox.Tests
                 context.Write(new OutputItem { File = TestFile }, TestText);
             }
 
-            Assert.IsNotNull(outputFiles);
+            Assert.NotNull(outputFiles);
         }
 
-        [TestMethod]
+        [Fact]
         public void DisposeInvokesOutputFileManagerWhenThereAreNoAdditionalOutputsSoThatPreviouslyGeneratedFilesCanBeDeleted()
         {
             bool outputFileManagerInvoked = false;
@@ -274,10 +272,10 @@ namespace T4Toolbox.Tests
                 transformation.Host.UpdatedOutputFiles = (input, outputs) => outputFileManagerInvoked = true;
             }
 
-            Assert.IsTrue(outputFileManagerInvoked);
+            Assert.True(outputFileManagerInvoked);
         }
 
-        [TestMethod]
+        [Fact]
         public void DisposeUpdatesTemplateFileWhenSessionDoesNotHaveInputFile()
         {
             const string TemplateFile = "TestTemplate.tt";
@@ -290,10 +288,10 @@ namespace T4Toolbox.Tests
                 context.Write(new OutputItem { File = TestFile }, TestText);
             }
 
-            Assert.AreEqual(TemplateFile, actualInput);
+            Assert.Equal(TemplateFile, actualInput);
         }
 
-        [TestMethod]
+        [Fact]
         public void DisposeUpdatesInputFileWhenSessionHasInputFile()
         {
             const string ExpectedInput = "TestInput.cs";
@@ -307,10 +305,10 @@ namespace T4Toolbox.Tests
                 context.Write(new OutputItem { File = TestFile }, TestText);
             }
 
-            Assert.AreEqual(ExpectedInput, actualInput);
+            Assert.Equal(ExpectedInput, actualInput);
         }
 
-        [TestMethod]
+        [Fact]
         public void DisposeLogsTransformationExceptionsThrownByOutputFileManager()
         {
             CompilerErrorCollection actualErrors = null;
@@ -323,10 +321,10 @@ namespace T4Toolbox.Tests
             }
 
             var error = actualErrors.Cast<CompilerError>().Single();
-            Assert.AreEqual(TestText, error.ErrorText);
+            Assert.Equal(TestText, error.ErrorText);
         }
 
-        [TestMethod]
+        [Fact]
         public void DisposeLogsTransformationExceptionsThrownByTransformationEndedEventHandlers()
         {
             CompilerErrorCollection actualErrors = null;
@@ -337,10 +335,10 @@ namespace T4Toolbox.Tests
                 context.Disposed += delegate { throw new TransformationException(); };
             }
 
-            Assert.AreEqual(1, actualErrors.Count);
+            Assert.Equal(1, actualErrors.Count);
         }
 
-        [TestMethod]
+        [Fact]
         public void DisposeReportsTemplateFileInErrorsWhenSessionDoesNotHaveInputFile()
         {
             const string TemplateFile = "TestTemplate.tt";
@@ -353,10 +351,10 @@ namespace T4Toolbox.Tests
                 context.Disposed += delegate { throw new TransformationException(); };
             }
 
-            Assert.AreEqual(TemplateFile, actualErrors.Cast<CompilerError>().Single().FileName);
+            Assert.Equal(TemplateFile, actualErrors.Cast<CompilerError>().Single().FileName);
         }
 
-        [TestMethod]
+        [Fact]
         public void DisposeReportsInputFileInErrorsWhenSessionHasInputFile()
         {
             const string InputFile = "TestInput.cs";
@@ -369,34 +367,34 @@ namespace T4Toolbox.Tests
                 context.Disposed += delegate { throw new TransformationException(); };
             }
 
-            Assert.AreEqual(InputFile, actualErrors.Cast<CompilerError>().Single().FileName);
+            Assert.Equal(InputFile, actualErrors.Cast<CompilerError>().Single().FileName);
         }
 
         #endregion
 
         #region GetMetadataValue
 
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void GetMetadataValueThrowsArgumentNullExceptionWhenNameIsNull()
         {
             using (var transformation = new FakeTransformation())
             using (var context = new TransformationContext(transformation, transformation.GenerationEnvironment))
             {
-                context.GetMetadataValue(null);
-            }                                  
+                Assert.Throws<ArgumentNullException>(() => context.GetMetadataValue(null));
+            }
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void GetMetadataValueThrowsArgumentExceptionWhenNameIsEmpty()
         {
             using (var transformation = new FakeTransformation())
             using (var context = new TransformationContext(transformation, transformation.GenerationEnvironment))
             {
-                context.GetMetadataValue(" \t\r\n");
+                Assert.Throws<ArgumentException>(() => context.GetMetadataValue(" \t\r\n"));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void GetMetadataValueReturnsValueSuppliedByProvider()
         {
             using (var transformation = new FakeTransformation())
@@ -404,11 +402,11 @@ namespace T4Toolbox.Tests
             {
                 const string ExpectedValue = "TestValue";
                 transformation.Host.GetMetadataValue = (hierarchy, fileName, metadataName) => ExpectedValue;
-                Assert.AreEqual(ExpectedValue, context.GetMetadataValue("TestProperty"));
+                Assert.Equal(ExpectedValue, context.GetMetadataValue("TestProperty"));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void GetMetadataValuePassesHostHierarchyToProvider()
         {
             using (var transformation = new FakeTransformation())
@@ -424,11 +422,11 @@ namespace T4Toolbox.Tests
                 };
 
                 context.GetMetadataValue("Irrelevant");
-                Assert.AreSame(transformation.Host.Hierarchy, actualHierarchy);
+                Assert.Same(transformation.Host.Hierarchy, actualHierarchy);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void GetMetadataValuePassesInputFileToProvider()
         {
             using (var transformation = new FakeTransformation())
@@ -444,7 +442,7 @@ namespace T4Toolbox.Tests
                 };
 
                 context.GetMetadataValue("Irrelevant");
-                Assert.AreSame(transformation.Host.TemplateFile, actualFileName);
+                Assert.Same(transformation.Host.TemplateFile, actualFileName);
             }
         }
 
@@ -452,46 +450,46 @@ namespace T4Toolbox.Tests
 
         #region GetPropertyValue
 
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void GetPropertyValueThrowsArgumentNullExceptionWhenNameIsNull()
         {
             using (var transformation = new FakeTransformation())
             using (var context = new TransformationContext(transformation, transformation.GenerationEnvironment))
             {
-                context.GetPropertyValue(null);
-            }                      
+                Assert.Throws<ArgumentNullException>(() => context.GetPropertyValue(null));
+            }
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void GetPropertyValueThrowsArgumentExceptionWhenNameIsEmpty()
         {
             using (var transformation = new FakeTransformation())
             using (var context = new TransformationContext(transformation, transformation.GenerationEnvironment))
             {
-                context.GetPropertyValue(" \t\r\n");
+                Assert.Throws<ArgumentException>(() => context.GetPropertyValue(" \t\r\n"));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void GetPropertyValueReturnsValueSuppliedByProvider()
         {
             using (var transformation = new FakeTransformation())
             using (var context = new TransformationContext(transformation, transformation.GenerationEnvironment))
             {
                 const string ExpectedValue = "TestValue";
-                transformation.Host.GetPropertyValue = (hierarchy, propertyName) => ExpectedValue; 
-                Assert.AreEqual(ExpectedValue, context.GetPropertyValue("TestProperty"));
-            }            
+                transformation.Host.GetPropertyValue = (hierarchy, propertyName) => ExpectedValue;
+                Assert.Equal(ExpectedValue, context.GetPropertyValue("TestProperty"));
+            }
         }
 
-        [TestMethod]
+        [Fact]
         public void GetPropertyValuePassesHostHierarchyToProvider()
         {
             using (var transformation = new FakeTransformation())
             using (var context = new TransformationContext(transformation, transformation.GenerationEnvironment))
             {
                 transformation.Host.Hierarchy = new object();
-                
+
                 object actualHierarchy = null;
                 transformation.Host.GetPropertyValue = (hierarchy, propertyName) =>
                 {
@@ -500,15 +498,15 @@ namespace T4Toolbox.Tests
                 };
 
                 context.GetPropertyValue("Irrelevant");
-                Assert.AreSame(transformation.Host.Hierarchy, actualHierarchy);
-            }                        
+                Assert.Same(transformation.Host.Hierarchy, actualHierarchy);
+            }
         }
 
         #endregion
 
         #region GetService
 
-        [TestMethod]
+        [Fact]
         public void GetServiceDelegatesToHost()
         {
             using (var transformation = new FakeTransformation())
@@ -516,17 +514,17 @@ namespace T4Toolbox.Tests
             {
                 var expected = ((IServiceProvider)transformation.Host).GetService(typeof(ITransformationContextProvider));
                 var actual = context.GetService(typeof(ITransformationContextProvider));
-                Assert.AreSame(expected, actual);
-            }          
+                Assert.Same(expected, actual);
+            }
         }
 
-        [TestMethod]
+        [Fact]
         public void GetServiceReturnsNullWhenServiceIsNotAvailable()
         {
             using (var transformation = new FakeTransformation())
             using (var context = new TransformationContext(transformation, transformation.GenerationEnvironment))
             {
-                Assert.IsNull(context.GetService(typeof(ICloneable))); // Bogus service
+                Assert.Null(context.GetService(typeof(ICloneable))); // Bogus service
             }
         }
 
@@ -534,14 +532,14 @@ namespace T4Toolbox.Tests
 
         #region Host
 
-        [TestMethod]
+        [Fact]
         public void HostReturnsHostOfTransformation()
         {
             using (var transformation = new FakeTransformation())
             using (var context = new TransformationContext(transformation, transformation.GenerationEnvironment))
             {
-                Assert.IsNotNull(context.Host);
-                Assert.AreSame(transformation.Host, context.Host);
+                Assert.NotNull(context.Host);
+                Assert.Same(transformation.Host, context.Host);
             }
         }
 
@@ -549,7 +547,7 @@ namespace T4Toolbox.Tests
 
         #region Initialize
 
-        [TestMethod]
+        [Fact]
         public void InitializeSetsCurrent()
         {
             using (var transformation = new FakeTransformation())
@@ -557,7 +555,7 @@ namespace T4Toolbox.Tests
                 TransformationContext.Initialize(transformation, transformation.GenerationEnvironment);
                 try
                 {
-                    Assert.IsNotNull(TransformationContext.Current);
+                    Assert.NotNull(TransformationContext.Current);
                 }
                 finally
                 {
@@ -566,51 +564,47 @@ namespace T4Toolbox.Tests
             }
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void InitializeThrowsArgumentNullExceptionWhenTransformationIsNull()
         {
-            TransformationContext.Initialize(null, new StringBuilder());
+            Assert.Throws<ArgumentNullException>(() => TransformationContext.Initialize(null, new StringBuilder()));
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void InitializeThrowsArgumentNullExceptionWhenGenerationEnvironmentIsNull()
         {
             using (var transformation = new FakeTransformation())
             {
-                TransformationContext.Initialize(transformation, null);
+                Assert.Throws<ArgumentNullException>(() => TransformationContext.Initialize(transformation, null));
             }
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void InitializeThrowsArgumentExceptionWhenTransformationIsNotHostSpecific()
         {
-            using (var transformation = new HostNeutralTransformation())
-            {
-                TransformationContext.Initialize(transformation, transformation.GenerationEnvironment);
-            }
+            using var transformation = new HostNeutralTransformation();
+            Assert.Throws<ArgumentException>(() => TransformationContext.Initialize(transformation, transformation.GenerationEnvironment));
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void InitializeThrowsArgumentExceptionWhenTransformationHostIsNull()
         {
-            using (var transformation = new FakeTransformation())
-            {
-                transformation.Host = null;
-                TransformationContext.Initialize(transformation, transformation.GenerationEnvironment);
-            }            
+            using var transformation = new FakeTransformation();
+            transformation.Host = null;
+            Assert.Throws<ArgumentException>(() => TransformationContext.Initialize(transformation, transformation.GenerationEnvironment));
         }
 
         #endregion
 
         #region Transformation
 
-        [TestMethod]
+        [Fact]
         public void TransformationReturnsTransformationPassedToConstructor()
         {
             using (var transformation = new FakeTransformation())
             using (var context = new TransformationContext(transformation, transformation.GenerationEnvironment))
             {
-                Assert.AreSame(transformation, context.Transformation);
+                Assert.Same(transformation, context.Transformation);
             }
         }
 
@@ -618,7 +612,7 @@ namespace T4Toolbox.Tests
 
         #region Write
 
-        [TestMethod]
+        [Fact]
         public void WriteAppendsToPreviousTemplateOutput()
         {
             using (var transformation = new FakeTransformation())
@@ -626,21 +620,21 @@ namespace T4Toolbox.Tests
             {
                 context.Write(new OutputItem(), "TemplateOutput");
                 transformation.Write("TransformationOutput");
-                Assert.AreEqual("TemplateOutput" + "TransformationOutput", transformation.TransformText());
+                Assert.Equal("TemplateOutput" + "TransformationOutput", transformation.TransformText());
             }
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void WriteThrowsArgumentNullExceptionWhenOutputIsNull()
         {
             using (var transformation = new FakeTransformation())
             using (var context = new TransformationContext(transformation, transformation.GenerationEnvironment))
             {
-                context.Write(null, string.Empty);
+                Assert.Throws<ArgumentNullException>(() => context.Write(null, string.Empty));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteAppendsToTransformationWhenOutputFileIsNotSpecified()
         {
             using (var transformation = new FakeTransformation())
@@ -648,11 +642,11 @@ namespace T4Toolbox.Tests
             {
                 transformation.Write("TransformationOutput");
                 context.Write(new OutputItem(), "TemplateOutput");
-                Assert.AreEqual("TransformationOutput" + "TemplateOutput", transformation.TransformText());
+                Assert.Equal("TransformationOutput" + "TemplateOutput", transformation.TransformText());
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteRespectsTransformationIndentationForSingleLineText()
         {
             using (var transformation = new FakeTransformation())
@@ -660,11 +654,11 @@ namespace T4Toolbox.Tests
             {
                 transformation.PushIndent("\t");
                 context.Write(new OutputItem(), TestText);
-                Assert.AreEqual("\t" + TestText, transformation.TransformText());
-            }            
+                Assert.Equal("\t" + TestText, transformation.TransformText());
+            }
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteRespectsTransformationIndentationForMultilineText()
         {
             using (var transformation = new FakeTransformation())
@@ -674,11 +668,11 @@ namespace T4Toolbox.Tests
                 string text = TestText + Environment.NewLine + TestText;
                 context.Write(new OutputItem(), text);
                 string expectedOutput = "\t" + TestText + Environment.NewLine + "\t" + TestText;
-                Assert.AreEqual(expectedOutput, transformation.TransformText());
+                Assert.Equal(expectedOutput, transformation.TransformText());
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteCombinesTextWrittenToTheSameOutputMultipleTimes()
         {
             OutputFile[] outputFiles = null;
@@ -693,10 +687,10 @@ namespace T4Toolbox.Tests
             }
 
             OutputFile outputFile = outputFiles.Single(output => output.File == TestFile);
-            Assert.AreEqual(TestText + TestText, outputFile.Content.ToString());
+            Assert.Equal(TestText + TestText, outputFile.Content.ToString());
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteCombinesTextOfDifferentOutputsWithTheSameFileName()
         {
             OutputFile[] outputFiles = null;
@@ -710,10 +704,10 @@ namespace T4Toolbox.Tests
             }
 
             OutputFile outputFile = outputFiles.Single(output => output.File == TestFile);
-            Assert.AreEqual(TestText + TestText, outputFile.Content.ToString());
+            Assert.Equal(TestText + TestText, outputFile.Content.ToString());
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteCombinesFileMetadata()
         {
             OutputFile[] outputFiles = null;
@@ -733,11 +727,11 @@ namespace T4Toolbox.Tests
             }
 
             OutputFile outputFile = outputFiles.Single(output => output.File == TestFile);
-            Assert.AreEqual("TextTemplatingFileGenerator", outputFile.Metadata["Generator"]);
-            Assert.AreEqual("Test.txt", outputFile.Metadata["LastGenOutput"]);
+            Assert.Equal("TextTemplatingFileGenerator", outputFile.Metadata["Generator"]);
+            Assert.Equal("Test.txt", outputFile.Metadata["LastGenOutput"]);
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteCombinesFileReferences()
         {
             OutputFile[] outputFiles = null;
@@ -757,11 +751,11 @@ namespace T4Toolbox.Tests
             }
 
             OutputFile outputFile = outputFiles.Single(output => output.File == TestFile);
-            Assert.IsTrue(outputFile.References.Contains("System"));
-            Assert.IsTrue(outputFile.References.Contains("System.Xml"));
+            Assert.True(outputFile.References.Contains("System"));
+            Assert.True(outputFile.References.Contains("System.Xml"));
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteSetsFileItemType()
         {
             OutputFile[] outputFiles = null;
@@ -774,10 +768,10 @@ namespace T4Toolbox.Tests
             }
 
             OutputFile outputFile = outputFiles.Single(output => output.File == TestFile);
-            Assert.AreEqual(ItemType.Compile, outputFile.ItemType);
+            Assert.Equal(ItemType.Compile, outputFile.ItemType);
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteSetsFileItemTypeForDefaultOutput()
         {
             OutputFile[] outputFiles = null;
@@ -790,10 +784,10 @@ namespace T4Toolbox.Tests
             }
 
             OutputFile outputFile = outputFiles.Single(output => string.IsNullOrEmpty(output.File));
-            Assert.AreEqual(ItemType.Compile, outputFile.ItemType);            
+            Assert.Equal(ItemType.Compile, outputFile.ItemType);
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteSetsFileCopyToOutputDirectory()
         {
             OutputFile[] outputFiles = null;
@@ -806,10 +800,10 @@ namespace T4Toolbox.Tests
             }
 
             OutputFile outputFile = outputFiles.Single(output => output.File == TestFile);
-            Assert.AreEqual(CopyToOutputDirectory.CopyAlways, outputFile.CopyToOutputDirectory);
+            Assert.Equal(CopyToOutputDirectory.CopyAlways, outputFile.CopyToOutputDirectory);
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteSetsFileCustomTool()
         {
             OutputFile[] outputFiles = null;
@@ -822,10 +816,10 @@ namespace T4Toolbox.Tests
             }
 
             OutputFile outputFile = outputFiles.Single(output => output.File == TestFile);
-            Assert.AreEqual("TextTemplatingFileGenerator", outputFile.CustomTool);
+            Assert.Equal("TextTemplatingFileGenerator", outputFile.CustomTool);
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteSetsFileCustomToolNamespace()
         {
             OutputFile[] outputFiles = null;
@@ -838,10 +832,10 @@ namespace T4Toolbox.Tests
             }
 
             OutputFile outputFile = outputFiles.Single(output => output.File == TestFile);
-            Assert.AreEqual("Microsoft", outputFile.CustomToolNamespace);
+            Assert.Equal("Microsoft", outputFile.CustomToolNamespace);
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteSetsFileDirectory()
         {
             OutputFile[] outputFiles = null;
@@ -854,10 +848,10 @@ namespace T4Toolbox.Tests
             }
 
             OutputFile outputFile = outputFiles.Single(output => output.File == TestFile);
-            Assert.AreEqual("SubFolder", outputFile.Directory);
+            Assert.Equal("SubFolder", outputFile.Directory);
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteSetsFileEncoding()
         {
             OutputFile[] outputFiles = null;
@@ -870,10 +864,10 @@ namespace T4Toolbox.Tests
             }
 
             OutputFile outputFile = outputFiles.Single(output => output.File == TestFile);
-            Assert.AreEqual(Encoding.UTF7, outputFile.Encoding);
+            Assert.Equal(Encoding.UTF7, outputFile.Encoding);
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteSetsFileEncodingForDefaultOutput()
         {
             OutputFile[] outputFiles = null;
@@ -886,10 +880,10 @@ namespace T4Toolbox.Tests
             }
 
             OutputFile outputFile = outputFiles.Single(output => string.IsNullOrEmpty(output.File));
-            Assert.AreEqual(Encoding.UTF7, outputFile.Encoding);
+            Assert.Equal(Encoding.UTF7, outputFile.Encoding);
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteSetsFilePreserveExistingFile()
         {
             OutputFile[] outputFiles = null;
@@ -902,10 +896,10 @@ namespace T4Toolbox.Tests
             }
 
             OutputFile outputFile = outputFiles.Single(output => output.File == TestFile);
-            Assert.AreEqual(true, outputFile.PreserveExistingFile);
+            Assert.Equal(true, outputFile.PreserveExistingFile);
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteSetsFileProject()
         {
             OutputFile[] outputFiles = null;
@@ -918,40 +912,38 @@ namespace T4Toolbox.Tests
             }
 
             OutputFile outputFile = outputFiles.Single(output => output.File == TestFile);
-            Assert.AreEqual("Test.proj", outputFile.Project);
+            Assert.Equal("Test.proj", outputFile.Project);
         }
 
-        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        [Fact]
         public void WriteThrowsInvalidOperationExceptionWhenDirectoryIsSpecifiedWithoutFile()
         {
             using (var transformation = new FakeTransformation())
             using (var context = new TransformationContext(transformation, transformation.GenerationEnvironment))
             {
-                context.Write(new OutputItem { Directory = "SubFolder" }, string.Empty);
+                Assert.Throws<InvalidOperationException>(() => context.Write(new OutputItem { Directory = "SubFolder" }, string.Empty));
             }
         }
 
-        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        [Fact]
         public void WriteThrowsInvalidOperationExceptionWhenProjectIsSpecifiedWithoutFile()
         {
             using (var transformation = new FakeTransformation())
             using (var context = new TransformationContext(transformation, transformation.GenerationEnvironment))
             {
-                context.Write(new OutputItem { Project = "Test.proj" }, string.Empty);
+                Assert.Throws<InvalidOperationException>(() => context.Write(new OutputItem { Project = "Test.proj" }, string.Empty));
             }
         }
 
-        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        [Fact]
         public void WriteThrowsInvalidOperationExceptionWhenPreserveExistingFileIsSpecifiedWithoutFile()
         {
-            using (var transformation = new FakeTransformation())
-            using (var context = new TransformationContext(transformation, transformation.GenerationEnvironment))
-            {
-                context.Write(new OutputItem { PreserveExistingFile = true }, string.Empty);
-            }            
+            using var transformation = new FakeTransformation();
+            using var context = new TransformationContext(transformation, transformation.GenerationEnvironment);
+            Assert.Throws<InvalidOperationException>(() => context.Write(new OutputItem { PreserveExistingFile = true }, string.Empty));
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteThrowsInvalidOperationExceptionWhenEncodingIsInconsistent()
         {
             WriteThrowsInvalidOperationException(
@@ -960,7 +952,7 @@ namespace T4Toolbox.Tests
                 new[] { "Encoding", Encoding.ASCII.EncodingName, Encoding.UTF8.EncodingName });
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteThrowsInvalidOperationExceptionWhenBuildActionIsInconsistent()
         {
             WriteThrowsInvalidOperationException(
@@ -969,7 +961,7 @@ namespace T4Toolbox.Tests
                 new[] { "ItemType", ItemType.Compile, ItemType.Content });
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteThrowsInvalidOperationExceptionWhenCopyToOutputDirectoryIsInconsistent()
         {
             WriteThrowsInvalidOperationException(
@@ -978,7 +970,7 @@ namespace T4Toolbox.Tests
                 new[] { "CopyToOutputDirectory", "PreserveNewest", "Always" });
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteThrowsInvalidOperationExceptionWhenCustomToolIsInconsistent()
         {
             WriteThrowsInvalidOperationException(
@@ -987,7 +979,7 @@ namespace T4Toolbox.Tests
                 new[] { "TextTemplatingFileGenerator", "TextTemplatingFilePreprocessor" });
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteThrowsInvalidOperationExceptionWhenCustomToolNamespaceIsInconsistent()
         {
             WriteThrowsInvalidOperationException(
@@ -996,7 +988,7 @@ namespace T4Toolbox.Tests
                 new[] { "CustomToolNamespace", "T4Toolbox", "Microsoft" });
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteThrowsInvalidOperationExceptionWhenMetadataIsInconsistent()
         {
             var first = new OutputItem();
@@ -1008,7 +1000,7 @@ namespace T4Toolbox.Tests
             WriteThrowsInvalidOperationException(first, second, new[] { "Metadata", "Generator", "TextTemplatingFileGenerator", "TextTemplatingFilePreprocessor" });
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteThrowsInvalidOperationExceptionWhenPreserveExistingFileIsInconsistent()
         {
             WriteThrowsInvalidOperationException(
@@ -1034,10 +1026,10 @@ namespace T4Toolbox.Tests
                 }
                 catch (InvalidOperationException e)
                 {
-                    Assert.AreNotEqual(typeof(TransformationException), e.GetType());
+                    Assert.NotEqual(typeof(TransformationException), e.GetType());
                     foreach (string keyword in keywords)
                     {
-                        StringAssert.Contains(e.Message, keyword);
+                        Assert.Contains(keyword, e.Message);
                     }
                 }
             }

@@ -6,328 +6,322 @@ namespace T4Toolbox.Tests
 {
     using System;
     using System.Text;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
     /// A test class for <see cref="OutputItem"/>.
     /// </summary>
-    [TestClass]
     public class OutputItemTest
     {
         #region CopyToOutputDirectory
 
-        [TestMethod]
+        [Fact]
         public void CopyToOutputDirectoryIsDoNotCopyByDefault()
         {
             var output = new OutputItem();
-            Assert.AreEqual(CopyToOutputDirectory.DoNotCopy, output.CopyToOutputDirectory);
+            Assert.Equal(CopyToOutputDirectory.DoNotCopy, output.CopyToOutputDirectory);
         }
 
-        [TestMethod]
+        [Fact]
         public void CopyToOutputDirectoryCanBeSet()
         {
             var output = new OutputItem();
-            
+
             output.CopyToOutputDirectory = CopyToOutputDirectory.CopyAlways;
-            Assert.AreEqual(CopyToOutputDirectory.CopyAlways, output.CopyToOutputDirectory);
+            Assert.Equal(CopyToOutputDirectory.CopyAlways, output.CopyToOutputDirectory);
 
             output.CopyToOutputDirectory = CopyToOutputDirectory.CopyIfNewer;
-            Assert.AreEqual(CopyToOutputDirectory.CopyIfNewer, output.CopyToOutputDirectory);
+            Assert.Equal(CopyToOutputDirectory.CopyIfNewer, output.CopyToOutputDirectory);
 
             output.CopyToOutputDirectory = CopyToOutputDirectory.DoNotCopy;
-            Assert.AreEqual(CopyToOutputDirectory.DoNotCopy, output.CopyToOutputDirectory);
+            Assert.Equal(CopyToOutputDirectory.DoNotCopy, output.CopyToOutputDirectory);
         }
 
-        [TestMethod]
+        [Fact]
         public void CopyToOutputDirectoryIsStoredAsMetadata()
         {
             var output = new OutputItem();
-            
+
             output.CopyToOutputDirectory = CopyToOutputDirectory.DoNotCopy;
-            Assert.AreEqual(string.Empty, output.Metadata[ItemMetadata.CopyToOutputDirectory]);
+            Assert.Equal(string.Empty, output.Metadata[ItemMetadata.CopyToOutputDirectory]);
 
             output.CopyToOutputDirectory = CopyToOutputDirectory.CopyAlways;
-            Assert.AreEqual("Always", output.Metadata[ItemMetadata.CopyToOutputDirectory]);
+            Assert.Equal("Always", output.Metadata[ItemMetadata.CopyToOutputDirectory]);
 
             output.CopyToOutputDirectory = CopyToOutputDirectory.CopyIfNewer;
-            Assert.AreEqual("PreserveNewest", output.Metadata[ItemMetadata.CopyToOutputDirectory]);
+            Assert.Equal("PreserveNewest", output.Metadata[ItemMetadata.CopyToOutputDirectory]);
         }
 
         #endregion
 
         #region CustomTool
 
-        [TestMethod]
+        [Fact]
         public void CustomToolIsEmptyStringByDefault()
         {
             var output = new OutputItem();
-            Assert.AreEqual(string.Empty, output.CustomTool);
+            Assert.Equal(string.Empty, output.CustomTool);
         }
 
-        [TestMethod]
+        [Fact]
         public void CustomToolCanBeSet()
         {
             var output = new OutputItem { CustomTool = "TextTemplatingFileGenerator" };
-            Assert.AreEqual("TextTemplatingFileGenerator", output.CustomTool);
+            Assert.Equal("TextTemplatingFileGenerator", output.CustomTool);
         }
 
-        [TestMethod]
+        [Fact]
         public void CustomToolIsStoredAsMetadata()
         {
             var output = new OutputItem { CustomTool = "TextTemplatingFileGenerator" };
-            Assert.AreEqual("TextTemplatingFileGenerator", output.Metadata[ItemMetadata.Generator]);
+            Assert.Equal("TextTemplatingFileGenerator", output.Metadata[ItemMetadata.Generator]);
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void CustomToolThrowsArgumentNullExceptionWhenNewValueIsNull()
         {
             var output = new OutputItem();
-            output.CustomTool = null;
+            Assert.Throws<ArgumentNullException>(() => output.CustomTool = null);
         }
 
         #endregion
 
         #region CustomToolNamespace
 
-        [TestMethod]
+        [Fact]
         public void CustomToolNamespaceIsEmptyStringByDefault()
         {
             var output = new OutputItem();
-            Assert.AreEqual(string.Empty, output.CustomToolNamespace);
+            Assert.Equal(string.Empty, output.CustomToolNamespace);
         }
 
-        [TestMethod]
+        [Fact]
         public void CustomToolNamespaceCanBeSet()
         {
             var output = new OutputItem { CustomToolNamespace = "T4Toolbox" };
-            Assert.AreEqual("T4Toolbox", output.CustomToolNamespace);
+            Assert.Equal("T4Toolbox", output.CustomToolNamespace);
         }
 
-        [TestMethod]
+        [Fact]
         public void CustomToolNamespaceIsStoredAsMetadata()
         {
             var output = new OutputItem { CustomToolNamespace = "T4Toolbox" };
-            Assert.AreEqual("T4Toolbox", output.Metadata[ItemMetadata.CustomToolNamespace]);            
+            Assert.Equal("T4Toolbox", output.Metadata[ItemMetadata.CustomToolNamespace]);
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void CustomToolNamespaceThrowsArgumentNullExceptionWhenNewValueIsNull()
         {
             var output = new OutputItem();
-            output.CustomToolNamespace = null;
+            Assert.Throws<ArgumentNullException>(() => output.CustomToolNamespace = null);
         }
 
         #endregion
 
         #region Directory
 
-        [TestMethod]
+        [Fact]
         public void DirectoryIsEmptyStringByDefault()
         {
             var output = new OutputItem();
-            Assert.AreEqual(string.Empty, output.Directory);
+            Assert.Equal(string.Empty, output.Directory);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void DirectoryThrowsArgumentNullExceptionWhenNewValueIsNull()
         {
             var output = new OutputItem();
-            output.Directory = null;
+            Assert.Throws<ArgumentNullException>(() => output.Directory = null);
         }
 
         #endregion
 
         #region Encoding
 
-        [TestMethod]
+        [Fact]
         public void EncodingIsUtf8ByDefault()
         {
             var output = new OutputItem();
-            Assert.AreEqual(Encoding.UTF8, output.Encoding);
+            Assert.Equal(Encoding.UTF8, output.Encoding);
         }
 
-        [TestMethod]
+        [Fact]
         public void EncodingCanBeSet()
         {
             var output = new OutputItem { Encoding = Encoding.ASCII };
-            Assert.AreEqual(Encoding.ASCII, output.Encoding);
+            Assert.Equal(Encoding.ASCII, output.Encoding);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void EncodingThrowsArgumentNullExceptionWhenNewValueIsNull()
         {
             var output = new OutputItem();
-            output.Encoding = null;
+            Assert.Throws<ArgumentNullException>(() => output.Encoding = null);
         }
 
         #endregion
 
         #region File
 
-        [TestMethod]
+        [Fact]
         public void FileIsEmptyStringByDefault()
         {
             var output = new OutputItem();
-            Assert.AreEqual(string.Empty, output.File);
+            Assert.Equal(string.Empty, output.File);
         }
 
-        [TestMethod]
+        [Fact]
         public void FileCanBeSet()
         {
             var output = new OutputItem { File = "Test.cs" };
-            Assert.AreEqual("Test.cs", output.File);
+            Assert.Equal("Test.cs", output.File);
         }
 
-        [TestMethod]
+        [Fact]
         public void FileUpdatesDirectoryPropertyWhenItIncludesDirectoryName()
         {
             var output = new OutputItem { File = @"Folder\Test.cs" };
-            Assert.AreEqual("Test.cs", output.File);
-            Assert.AreEqual("Folder", output.Directory);
+            Assert.Equal("Test.cs", output.File);
+            Assert.Equal("Folder", output.Directory);
         }
 
-        [TestMethod]
+        [Fact]
         public void FilePreservesDirectoryPropertyWhenItDoesNotIncludeDirectoryName()
         {
             var output = new OutputItem { Directory = "Folder", File = "NewTest.cs" };
-            Assert.AreEqual("Folder", output.Directory);
+            Assert.Equal("Folder", output.Directory);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void FileThrowsArgumentNullExceptionWhenNewValueIsNull()
         {
             var output = new OutputItem();
-            output.File = null;
+            Assert.Throws<ArgumentNullException>(() => output.File = null);
         }
 
         #endregion
 
         #region ItemType
 
-        [TestMethod]
+        [Fact]
         public void ItemTypeIsEmptyStringByDefault()
         {
             var output = new OutputItem();
-            Assert.AreEqual(string.Empty, output.ItemType);
+            Assert.Equal(string.Empty, output.ItemType);
         }
 
-        [TestMethod]
+        [Fact]
         public void ItemTypeCanBeSet()
         {
             var output = new OutputItem { ItemType = ItemType.Compile };
-            Assert.AreEqual(ItemType.Compile, output.ItemType);
+            Assert.Equal(ItemType.Compile, output.ItemType);
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void ItemTypeThrowsArgumentNullExceptionWhenNewValueIsNull()
         {
             var output = new OutputItem();
-            output.ItemType = null;
+            Assert.Throws<ArgumentNullException>(() => output.ItemType = null);
         }
 
         #endregion
 
         #region Metadata
 
-        [TestMethod]
+        [Fact]
         public void MetadataIsEmptyByDefault()
         {
             var output = new OutputItem();
-            Assert.AreEqual(0, output.Metadata.Count);
+            Assert.Empty(output.Metadata);
         }
 
-        [TestMethod]
+        [Fact]
         public void MetadataIsNotCaseSensitive()
         {
             var output = new OutputItem();
             output.Metadata["TEST"] = "value";
-            Assert.AreEqual("value", output.Metadata["test"]);
+            Assert.Equal("value", output.Metadata["test"]);
         }
 
         #endregion
 
         #region Path
 
-        [TestMethod]
+        [Fact]
         public void PathReturnsEmptyStringByDefault()
         {
             var output = new OutputItem();
-            Assert.AreEqual(string.Empty, output.Path);
+            Assert.Equal(string.Empty, output.Path);
         }
 
-        [TestMethod]
+        [Fact]
         public void PathReturnsFileName()
         {
             var output = new OutputItem { File = "Test.cs" };
-            Assert.AreEqual("Test.cs", output.Path);
+            Assert.Equal("Test.cs", output.Path);
         }
 
-        [TestMethod]
+        [Fact]
         public void PathCombinesDirectoryAndFileName()
         {
             var output = new OutputItem { File = "Test.cs", Directory = "Folder" };
-            Assert.AreEqual(@"Folder\Test.cs", output.Path);
+            Assert.Equal(@"Folder\Test.cs", output.Path);
         }
 
-        [TestMethod]
+        [Fact]
         public void PathCombinesProjectDirectoryAndFileName()
         {
             var output = new OutputItem { File = "Test.cs", Project = @"Project\Test.proj" };
-            Assert.AreEqual(@"Project\Test.cs", output.Path);           
+            Assert.Equal(@"Project\Test.cs", output.Path);
         }
 
-        [TestMethod]
+        [Fact]
         public void PathCombinesDirectoryAndProjectDirectory()
         {
             var output = new OutputItem { File = "Test.cs", Directory = "Folder", Project = @"Project\Test.proj" };
-            Assert.AreEqual(@"Project\Folder\Test.cs", output.Path);
+            Assert.Equal(@"Project\Folder\Test.cs", output.Path);
         }
 
-        [TestMethod]
+        [Fact]
         public void PathReturnsIgnoresProjectWhenDirectoryIsRooted()
         {
             var output = new OutputItem { File = @"C:\Folder\Test.cs", Project = @"Project\Test.proj" };
-            Assert.AreEqual(@"C:\Folder\Test.cs", output.Path);
+            Assert.Equal(@"C:\Folder\Test.cs", output.Path);
         }
 
         #endregion
 
         #region Project
 
-        [TestMethod]
+        [Fact]
         public void ProjectIsEmptyStringByDefault()
         {
             var output = new OutputItem();
-            Assert.AreEqual(string.Empty, output.Project);
+            Assert.Equal(string.Empty, output.Project);
         }
 
-        [TestMethod]
+        [Fact]
         public void ProjectCanBeSet()
         {
             var output = new OutputItem { Project = "Test.proj" };
-            Assert.AreEqual("Test.proj", output.Project);
+            Assert.Equal("Test.proj", output.Project);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void ProjectThrowsArgumentNullExceptionWhenNewValueIsNull()
         {
             var output = new OutputItem();
-            output.Project = null;
+            Assert.Throws<ArgumentNullException>(() => output.Project = null);
         }
 
         #endregion
 
         #region References
 
-        [TestMethod]
+        [Fact]
         public void ReferencesIsEmptyByDefault()
         {
             var output = new OutputItem();
-            Assert.AreEqual(0, output.References.Count);
+            Assert.Empty(output.References);
         }
 
         #endregion
